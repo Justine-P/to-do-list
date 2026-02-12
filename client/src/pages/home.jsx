@@ -170,53 +170,64 @@ function home() {
                         </button>
                     </div>
 
+                    {/* Modal form (appears as centered dialog) */}
                     {showForm && (
-                        <div className="mb-10 p-8 bg-purple-50/50 border border-purple-100 rounded-[2rem] animate-in fade-in slide-in-from-top-4 duration-300">
-                            <h3 className="text-xl font-bold mb-6 text-purple-900 flex items-center gap-2">
-                                {editingItem ? "✏️ Edit List" : "✨ Create New List"}
-                            </h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-                                <div>
-                                    <label className="block text-sm font-bold mb-2 text-purple-900/70 uppercase">List Title</label>
-                                    <input
-                                        type="text"
-                                        className="w-full px-4 py-3 border border-purple-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent bg-white shadow-sm transition-all"
-                                        value={title}
-                                        onChange={(e) => setTitle(e.target.value)}
-                                    />
+                        <div
+                            className="fixed inset-0 z-40 flex items-center justify-center bg-black/40"
+                            onClick={() => {
+                                setShowForm(false);
+                                setEditingItem(null);
+                                setTitle("");
+                                setStatus("");
+                            }}
+                        >
+                            <div className="w-full max-w-2xl mx-auto p-6 bg-white rounded-2xl shadow-lg" onClick={(e) => e.stopPropagation()}>
+                                <h3 className="text-xl font-bold mb-6 text-purple-900 flex items-center gap-2">
+                                    {editingItem ? "✏️ Edit List" : "✨ Create New List"}
+                                </h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">
+                                    <div>
+                                        <label className="block text-sm font-bold mb-2 text-purple-900/70 uppercase">List Title</label>
+                                        <input
+                                            type="text"
+                                            className="w-full px-4 py-3 border border-purple-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent bg-white shadow-sm transition-all"
+                                            value={title}
+                                            onChange={(e) => setTitle(e.target.value)}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold mb-2 text-purple-900/70 uppercase">Status</label>
+                                        <select
+                                            className="w-full px-4 py-3 border border-purple-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent bg-white shadow-sm transition-all"
+                                            value={status}
+                                            onChange={(e) => setStatus(e.target.value)}
+                                        >
+                                            <option value="">Select status...</option>
+                                            <option value="Pending">Pending</option>
+                                            <option value="In Progress">In Progress</option>
+                                            <option value="Completed">Completed</option>
+                                        </select>
+                                    </div>
                                 </div>
-                                <div>
-                                    <label className="block text-sm font-bold mb-2 text-purple-900/70 uppercase">Status</label>
-                                    <select
-                                        className="w-full px-4 py-3 border border-purple-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent bg-white shadow-sm transition-all"
-                                        value={status}
-                                        onChange={(e) => setStatus(e.target.value)}
+                                <div className="flex justify-end gap-4">
+                                    <button
+                                        onClick={() => {
+                                            setShowForm(false);
+                                            setEditingItem(null);
+                                            setTitle("");
+                                            setStatus("");
+                                        }}
+                                        className="px-6 py-3 bg-white text-gray-600 hover:bg-gray-50 border border-gray-200 rounded-xl transition-all font-semibold"
                                     >
-                                        <option value="">Select status...</option>
-                                        <option value="Pending">Pending</option>
-                                        <option value="In Progress">In Progress</option>
-                                        <option value="Completed">Completed</option>
-                                    </select>
+                                        Cancel
+                                    </button>
+                                    <button
+                                        onClick={handleSubmit}
+                                        className="px-8 py-3 bg-purple-600 text-white hover:bg-purple-700 rounded-xl transition-all shadow-lg shadow-purple-200 font-bold active:scale-95"
+                                    >
+                                        {editingItem ? "Update Changes" : "Create List"}
+                                    </button>
                                 </div>
-                            </div>
-                            <div className="flex justify-end gap-4">
-                                <button
-                                    onClick={() => {
-                                        setShowForm(false);
-                                        setEditingItem(null);
-                                        setTitle("");
-                                        setStatus("");
-                                    }}
-                                    className="px-6 py-3 bg-white text-gray-600 hover:bg-gray-50 border border-gray-200 rounded-xl transition-all font-semibold"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    onClick={handleSubmit}
-                                    className="px-8 py-3 bg-purple-600 text-white hover:bg-purple-700 rounded-xl transition-all shadow-lg shadow-purple-200 font-bold active:scale-95"
-                                >
-                                    {editingItem ? "Update Changes" : "Create List"}
-                                </button>
                             </div>
                         </div>
                     )}
@@ -227,56 +238,43 @@ function home() {
                             <p className="text-gray-500 font-medium">No lists yet. Create your first list to get started!</p>
                         </div>
                     ) : (
-                        <div className="overflow-hidden rounded-2xl border border-purple-100">
-                            <table className="w-full border-collapse">
-                                <thead>
-                                    <tr className="bg-purple-50/80">
-                                        <th className="px-6 py-4 text-left text-sm font-bold text-purple-900 uppercase tracking-wider">Title</th>
-                                        <th className="px-6 py-4 text-left text-sm font-bold text-purple-900 uppercase tracking-wider">Status</th>
-                                        <th className="px-6 py-4 text-center text-sm font-bold text-purple-900 uppercase tracking-wider">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-purple-50">
-                                    {lists.map((item, index) => (
-                                        <tr key={item.id || index} className="hover:bg-purple-50/30 transition-colors group">
-                                            <td className="px-6 py-4 text-gray-800 font-medium">{item.title}</td>
-                                            <td className="px-6 py-4">
-                                                <span className={`px-3 py-1 rounded-full text-xs font-bold ${item.status === 'Completed' ? 'bg-green-100 text-green-700' :
-                                                    item.status === 'In Progress' ? 'bg-blue-100 text-blue-700' :
-                                                        'bg-purple-100 text-purple-700'
-                                                    }`}>
-                                                    {item.status}
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-4 text-center">
-                                                <div className="flex justify-center gap-2">
-                                                    <button
-                                                        onClick={() => handleOpen(item)}
-                                                        className="p-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg transition-all active:scale-90"
-                                                        title="Open"
-                                                    >
-                                                        <span className="text-sm">View</span>
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleEdit(item)}
-                                                        className="p-2 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-lg transition-all active:scale-90"
-                                                        title="Edit"
-                                                    >
-                                                        <span className="text-sm">Edit</span>
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleDelete(item.id)}
-                                                        className="p-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition-all active:scale-90"
-                                                        title="Delete"
-                                                    >
-                                                        <span className="text-sm">Delete</span>
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {lists.map((item, index) => (
+                                <div key={item.id || index} className="bg-white border border-purple-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition">
+                                    <div className="flex justify-between items-start gap-4">
+                                        <div>
+                                            <h3 className="text-lg font-semibold text-gray-800">{item.title}</h3>
+                                            <p className="text-xs text-gray-400 mt-2">{item.description || ''}</p>
+                                        </div>
+                                        <div className="text-right">
+                                            <span className={`px-3 py-1 rounded-full text-xs font-bold ${item.status === 'Completed' ? 'bg-green-100 text-green-700' : item.status === 'In Progress' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'}`}>
+                                                {item.status}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div className="mt-4 flex justify-end gap-2">
+                                        <button
+                                            onClick={() => handleOpen(item)}
+                                            className="px-3 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg transition-all active:scale-90 text-sm"
+                                        >
+                                            View
+                                        </button>
+                                        <button
+                                            onClick={() => handleEdit(item)}
+                                            className="px-3 py-2 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-lg transition-all active:scale-90 text-sm"
+                                        >
+                                            Edit
+                                        </button>
+                                        <button
+                                            onClick={() => handleDelete(item.id)}
+                                            className="px-3 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition-all active:scale-90 text-sm"
+                                        >
+                                            Delete
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
                     )}
 

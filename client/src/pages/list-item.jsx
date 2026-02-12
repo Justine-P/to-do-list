@@ -17,6 +17,7 @@ function ListItem() {
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
     const [addingItem, setAddingItem] = useState(false);
+    const [showForm, setShowForm] = useState(false);
 
     const fetchItems = async () => {
         try {
@@ -41,7 +42,8 @@ function ListItem() {
             setItemStatus("pending");
             setError("");
             setSuccess("Item added successfully");
-            fetchItems();
+            await fetchItems();
+            setShowForm(false);
         } catch (error) {
             console.error("Error adding item:", error);
             setError(error.response?.data?.message || "Error adding item");
@@ -116,17 +118,26 @@ function ListItem() {
     return (
         <div className="min-h-screen bg-purple-50">
             <div className="p-6 max-w-4xl mx-auto">
-                <div className="mb-8">
-                    <button
-                        onClick={() => navigate('/home')}
-                        className="bg-white border border-purple-200 text-purple-700 hover:bg-purple-50 px-6 py-2 rounded-xl transition-all shadow-sm hover:shadow-md active:scale-95 font-semibold flex items-center gap-2 mb-6"
-                    >
-                        <span>←</span> Back
-                    </button>
-                    <div>
-                        <h1 className="text-3xl font-extrabold text-purple-900">{listTitle}</h1>
-                        <p className="text-purple-600/60 text-sm mt-1 font-medium">Manage your items for this list</p>
+                <div className="mb-8 flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                        <button
+                            onClick={() => navigate('/home')}
+                            className="bg-white border border-purple-200 text-purple-700 hover:bg-purple-50 px-6 py-2 rounded-xl transition-all shadow-sm hover:shadow-md active:scale-95 font-semibold flex items-center gap-2"
+                        >
+                            <span>←</span> Back
+                        </button>
+                        <div>
+                            <h1 className="text-3xl font-extrabold text-purple-900">{listTitle}</h1>
+                            <p className="text-purple-600/60 text-sm mt-1 font-medium">Manage your items for this list</p>
+                        </div>
                     </div>
+
+                    <button
+                        onClick={() => setShowForm(true)}
+                        className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-xl transition-all shadow-sm active:scale-95 font-semibold"
+                    >
+                        + Add Task
+                    </button>
                 </div>
 
                 {error && (
@@ -142,45 +153,57 @@ function ListItem() {
                 )}
 
                 <div className="grid grid-cols-1 gap-8">
-                    {/* Add Item Section */}
-                    <div className="bg-white border border-purple-100 p-8 rounded-[2rem] shadow-xl shadow-purple-900/5">
-                        <h2 className="text-xl font-bold mb-6 text-gray-800 flex items-center gap-2">
-                            <span>✨</span> Add New Task
-                        </h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                            <div className="md:col-span-2">
-                                <label className="block text-sm font-bold mb-2 text-purple-900/70 uppercase">Description</label>
-                                <input
-                                    type="text"
-                                    className="w-full px-4 py-3 border border-purple-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400 bg-purple-50/30 transition-all font-medium"
-                                    value={desc}
-                                    onChange={(e) => {
-                                        setDesc(e.target.value);
-                                        if (error) setError("");
-                                    }}
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-bold mb-2 text-purple-900/70 uppercase">Status</label>
-                                <select
-                                    className="w-full px-4 py-3 border border-purple-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400 bg-purple-50/30 transition-all font-medium"
-                                    value={itemStatus}
-                                    onChange={(e) => setItemStatus(e.target.value)}
-                                >
-                                    <option value="pending">Pending</option>
-                                    <option value="in-progress">In Progress</option>
-                                    <option value="completed">Completed</option>
-                                </select>
+                    {/* Modal Add Item (matches home behavior) */}
+                    {showForm && (
+                        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40" onClick={() => setShowForm(false)}>
+                            <div className="w-full max-w-2xl mx-auto p-6 bg-white rounded-2xl shadow-lg" onClick={(e) => e.stopPropagation()}>
+                                <h3 className="text-xl font-bold mb-6 text-purple-900 flex items-center gap-2">
+                                    <span>✨</span> Add New Task
+                                </h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                    <div className="md:col-span-2">
+                                        <label className="block text-sm font-bold mb-2 text-purple-900/70 uppercase">Description</label>
+                                        <input
+                                            type="text"
+                                            className="w-full px-4 py-3 border border-purple-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400 bg-purple-50/30 transition-all font-medium"
+                                            value={desc}
+                                            onChange={(e) => {
+                                                setDesc(e.target.value);
+                                                if (error) setError("");
+                                            }}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold mb-2 text-purple-900/70 uppercase">Status</label>
+                                        <select
+                                            className="w-full px-4 py-3 border border-purple-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400 bg-purple-50/30 transition-all font-medium"
+                                            value={itemStatus}
+                                            onChange={(e) => setItemStatus(e.target.value)}
+                                        >
+                                            <option value="pending">Pending</option>
+                                            <option value="in-progress">In Progress</option>
+                                            <option value="completed">Completed</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div className="flex justify-end gap-4">
+                                    <button
+                                        onClick={() => setShowForm(false)}
+                                        className="px-6 py-3 bg-white text-gray-600 hover:bg-gray-50 border border-gray-200 rounded-xl transition-all font-semibold"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        onClick={handleAddItem}
+                                        disabled={addingItem}
+                                        className="px-8 py-3 bg-purple-600 text-white hover:bg-purple-700 rounded-xl transition-all shadow-lg shadow-purple-200 font-bold active:scale-95"
+                                    >
+                                        {addingItem ? 'Adding to list...' : 'Add Task to List'}
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                        <button
-                            onClick={handleAddItem}
-                            disabled={addingItem}
-                            className="w-full py-4 bg-purple-600 text-white hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl transition-all shadow-lg shadow-purple-200 font-bold text-lg active:scale-[0.98]"
-                        >
-                            {addingItem ? 'Adding to list...' : 'Add Task to List'}
-                        </button>
-                    </div>
+                    )}
 
                     {/* Items Section */}
                     <div className="bg-white border border-purple-100 p-8 rounded-[2rem] shadow-xl shadow-purple-900/5">
@@ -195,7 +218,7 @@ function ListItem() {
                                 <p className="text-gray-500 font-medium">No tasks yet. Ready to start?</p>
                             </div>
                         ) : (
-                            <div className="space-y-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {items.map((item) => (
                                     <div key={item.id} className="bg-white border border-purple-50 p-6 rounded-2xl hover:shadow-md transition-all group border-l-4 border-l-purple-400">
                                         {editingItem === item.id ? (
