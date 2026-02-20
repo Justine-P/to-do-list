@@ -93,23 +93,7 @@ function home() {
     const handleOpen = (item) => {
         navigate('/list-item', { state: { listId: item.id, listTitle: item.title } });
     };
-    /*   const handleEditlist = async () => {
-        try {
-          const response = await axios.get(`${API_URL}/edit-list`, {
-            title,
-            stats,
-          });
-          setLists(response.data);
-        } catch (error) {
-          console.error(
-            "There was an error!",
-            error.response?.data || error.message,
-          );
-          alert(
-            error.response?.data?.message || error.message || "An error occurred",
-          );
-        }
-      }; */
+  
 
     const fetchList = async () => {
         try {
