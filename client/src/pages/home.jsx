@@ -31,41 +31,69 @@ function home() {
         }
     };
 
-    const handleSubmit = async () => {
-        try {
-            let response;
-            if (editingItem) {
-                response = await axios.post(`${API_URL}/edit-list`, {
-                    id: editingItem.id,
-                    title,
-                    status,
-                });
-                setSuccess(response.data?.message || "List Updated successfully");
-            } else {
-                response = await axios.post(`${API_URL}/add-list`, {
-                    title,
-                    status,
-                });
-                setSuccess(response.data?.message || "List Added successfully");
-            }
-            console.log(response.data);
-            fetchList();
-            setTitle("");
-            setStatus("");
-            setEditingItem(null);
-            setShowForm(false);
-            navigate("/home");
-        } catch (error) {
-            console.error(
-                "There was an error!",
-                error.response?.data || error.message,
-            );
-            setError(
-                error.response?.data?.message || error.message || "An error occurred",
-            );
-        }
-    };
+    const handleAdd = async () => {
+    try {
+        const response = await axios.post(`${API_URL}/add-list`, {
+            title,
+            status,
+        });
 
+        setSuccess(response.data?.message || "List Added successfully");
+        console.log(response.data);
+
+        fetchList();
+        resetForm();
+
+    } catch (error) {
+        console.error(
+            "There was an error!",
+            error.response?.data || error.message
+        );
+        setError(
+            error.response?.data?.message || error.message || "An error occurred"
+        );
+    }
+};
+
+    const handleEditSubmit = async () => {
+    try {
+        const response = await axios.post(`${API_URL}/edit-list`, {
+            id: editingItem.id,
+            title,
+            status,
+        });
+
+        setSuccess(response.data?.message || "List Updated successfully");
+        console.log(response.data);
+
+        fetchList();
+        resetForm();
+
+    } catch (error) {
+        console.error(
+            "There was an error!",
+            error.response?.data || error.message
+        );
+        setError(
+            error.response?.data?.message || error.message || "An error occurred"
+        );
+    }
+};
+    const resetForm = () => {
+    setTitle("");
+    setStatus("");
+    setEditingItem(null);
+    setShowForm(false);
+    navigate("/home");
+};
+    
+   const handleSubmit = async () => {
+    if (editingItem) {
+        await handleEditSubmit();
+    } else {
+        await handleAdd();
+    }
+};
     const handleDelete = async (id) => {
         try {
             const response = await axios.post(`${API_URL}/delete-list`, { id });
